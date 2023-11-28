@@ -1,3 +1,4 @@
+const { error } = require("console");
 const database = require("../../database");
 
 const getUsers = (req, res) => {
@@ -41,8 +42,9 @@ const postUser = (req, res) => {
       res.status(201).send({ id: result.insertId });
     })
     .catch((err) => {
-      console.error(err);
-      res.sendStatus(500);
+     // console.error(err);
+      res.status(400).send({message : err.message});
+
     });
 };
 

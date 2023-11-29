@@ -161,7 +161,7 @@ describe("PUT /api/movies/:id", () => {
       .put(`/api/movies/1`)
       .send(movieWithMissingProps);
 
-    expect(response.status).toEqual(500);
+    expect(response.status).toEqual(422);
   });
 
   it("should return no movie", async () => {
@@ -175,7 +175,7 @@ describe("PUT /api/movies/:id", () => {
 
     const response = await request(app).put("/api/movies/0").send(newMovie);
 
-    expect(response.status).toEqual(404 || 500);
+    expect(response.status).toEqual(404 || 422);
   });
 });
 
@@ -219,6 +219,6 @@ describe("DELETE /api/movies/:id", () => {
   it("sould not delete movie", async () => {
     const id = -1;
     const response = await request(app).delete(`/api/movies/${id}`);
-    expect(response.status).toEqual(404 || 500);
+    expect(response.status).toEqual(404 || 422);
   });
 });

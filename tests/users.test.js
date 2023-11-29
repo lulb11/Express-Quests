@@ -162,7 +162,7 @@ describe("PUT /api/users/:id", () => {
       .put(`/api/users/1`)
       .send(userWithMissingProps);
 
-    expect(response.status).toEqual(500);
+    expect(response.status).toEqual(422);
   });
 
   it("should return no user", async () => {
@@ -219,6 +219,6 @@ describe("DELETE /api/users/:id", () => {
   it("sould not delete user", async () => {
     const id = -1;
     const response = await request(app).delete(`/api/users/${id}`);
-    expect(response.status).toEqual(404 || 500);
+    expect(response.status).toEqual(404 || 422);
   });
 });

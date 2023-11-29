@@ -6,6 +6,8 @@ const useUuid = require("../uuid.js");
 
 const database = require("../database");
 
+const randomNumber = require("../randomNumber.js");
+
 afterAll(() => database.end());
 
 describe("GET /api/users", () => {
@@ -163,7 +165,7 @@ describe("PUT /api/users/:id", () => {
     expect(response.status).toEqual(500);
   });
 
-  it("should return no movie", async () => {
+  it("should return no user", async () => {
     const newUser = {
       firstname: "Avatar",
       lastname: "James Cameron",
@@ -175,5 +177,43 @@ describe("PUT /api/users/:id", () => {
     const response = await request(app).put("/api/users/0").send(newUser);
 
     expect(response.status).toEqual(404);
+  });
+});
+describe("DELETE /api/users/:id", () => {
+  it("should delete user", async () => {
+    const id = randomNumber();
+
+    const [userBeforeDeletion] = await database.query(
+      "SELECT * FROM users WHERE id = ?",
+      [id]
+    );
+
+    const response = await request(app).delete(`/api/users/${id}`);
+    expect(response.status).toEqual(204);
+    const [result] = await database.query("SELECT * FROM users WHERE id = ?", [
+      id,
+    ]);
+    expect(result.length).toEqual(0);
+
+    if (userBeforeDeletion && userBeforeDeletion.length > 0) {
+      const { id, ...userData } = userBeforeDeletion[0];
+
+      await database.query(
+        "INSERT INTO users (id, firstname, lastname, email, city, language) VALUES (?, ?, ?, ?, ?, ?)",
+        [
+          id,
+          userData.firstname,
+          userData.lastname,
+          userData.email,
+          userData.city,
+          userData.language,
+        ]
+      );
+    }
+  });
+  it("sould not delete user", async () => {
+    const id = -1;
+    const response = await request(app).delete(`/api/users/${id}`);
+    expect(response.status).toEqual(404 || 500);
   });
 });

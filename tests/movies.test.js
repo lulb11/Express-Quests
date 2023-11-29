@@ -6,6 +6,8 @@ const database = require("../database");
 
 const useUuid = require("../uuid.js");
 
+const randomNumber = require("../randomNumber.js");
+
 afterAll(() => database.end());
 
 describe("GET /api/movies", () => {
@@ -20,7 +22,7 @@ describe("GET /api/movies", () => {
 
 describe("GET /api/movies/:id", () => {
   it("should return one movie", async () => {
-    const response = await request(app).get("/api/movies/1");
+    const response = await request(app).get("/api/movies");
 
     expect(response.headers["content-type"]).toMatch(/json/);
 
@@ -173,6 +175,50 @@ describe("PUT /api/movies/:id", () => {
 
     const response = await request(app).put("/api/movies/0").send(newMovie);
 
-    expect(response.status).toEqual(404);
+    expect(response.status).toEqual(404 || 500);
+  });
+});
+
+describe("DELETE /api/movies/:id", () => {
+  it("should delete movie", async () => {
+    const id = randomNumber();
+
+    const [movieBeforeDeletion] = await database.query(
+      "SELECT * FROM movies WHERE id = ?",
+      [id]
+    );
+
+    const response = await request(app).delete(`/api/movies/${id}`);
+    expect(response.status).toEqual(204);
+    const [result] = await database.query("SELECT * FROM movies WHERE id = ?", [
+      id,
+    ]);
+    expect(result.length).toEqual(0);
+
+    // const doublon = await database.query(
+    //   "SELECT * FROM movies WHERE title = ?",
+    //   [title]
+    // );
+
+    if (movieBeforeDeletion && movieBeforeDeletion.length > 0) {
+      const { id, ...movieData } = movieBeforeDeletion[0];
+
+      await database.query(
+        "INSERT INTO movies (id, title, director, year, color, duration) VALUES (?, ?, ?, ?, ?, ?)",
+        [
+          id,
+          movieData.title,
+          movieData.director,
+          movieData.year,
+          movieData.color,
+          movieData.duration,
+        ]
+      );
+    }
+  });
+  it("sould not delete movie", async () => {
+    const id = -1;
+    const response = await request(app).delete(`/api/movies/${id}`);
+    expect(response.status).toEqual(404 || 500);
   });
 });

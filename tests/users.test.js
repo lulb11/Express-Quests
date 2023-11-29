@@ -209,6 +209,11 @@ describe("DELETE /api/users/:id", () => {
           userData.language,
         ]
       );
+      const [lastResult] = await database.query(
+        "SELECT * FROM users WHERE id = ?",
+        [id]
+      );
+      expect(lastResult.length).toEqual(1);
     }
   });
   it("sould not delete user", async () => {

@@ -193,28 +193,28 @@ describe("DELETE /api/users/:id", () => {
     const [result] = await database.query("SELECT * FROM users WHERE id = ?", [
       id,
     ]);
+
     expect(result.length).toEqual(0);
 
-    if (userBeforeDeletion && userBeforeDeletion.length > 0) {
-      const { id, ...userData } = userBeforeDeletion[0];
+    const userData = { id, ...userBeforeDeletion[0] };
 
-      await database.query(
-        "INSERT INTO users (id, firstname, lastname, email, city, language) VALUES (?, ?, ?, ?, ?, ?)",
-        [
-          id,
-          userData.firstname,
-          userData.lastname,
-          userData.email,
-          userData.city,
-          userData.language,
-        ]
-      );
-      const [lastResult] = await database.query(
-        "SELECT * FROM users WHERE id = ?",
-        [id]
-      );
-      expect(lastResult.length).toEqual(1);
-    }
+    await database.query(
+      "INSERT INTO users (id, firstname, lastname, email, city, language) VALUES (?, ?, ?, ?, ?, ?)",
+      [
+        id,
+        userData.firstname,
+        userData.lastname,
+        userData.email,
+        userData.city,
+        userData.language,
+      ]
+    );
+    const [lastResult] = await database.query(
+      "SELECT * FROM users WHERE id = ?",
+      [id]
+    );
+    console.log(lastResult);
+    expect(lastResult.length).toEqual(1);
   });
   it("sould not delete user", async () => {
     const id = -1;

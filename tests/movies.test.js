@@ -195,26 +195,19 @@ describe("DELETE /api/movies/:id", () => {
     ]);
     expect(result.length).toEqual(0);
 
-    // const doublon = await database.query(
-    //   "SELECT * FROM movies WHERE title = ?",
-    //   [title]
-    // );
+    const movieData = { id, ...movieBeforeDeletion[0] };
 
-    if (movieBeforeDeletion && movieBeforeDeletion.length > 0) {
-      const { id, ...movieData } = movieBeforeDeletion[0];
-
-      await database.query(
-        "INSERT INTO movies (id, title, director, year, color, duration) VALUES (?, ?, ?, ?, ?, ?)",
-        [
-          id,
-          movieData.title,
-          movieData.director,
-          movieData.year,
-          movieData.color,
-          movieData.duration,
-        ]
-      );
-    }
+    await database.query(
+      "INSERT INTO movies (id, title, director, year, color, duration) VALUES (?, ?, ?, ?, ?, ?)",
+      [
+        id,
+        movieData.title,
+        movieData.director,
+        movieData.year,
+        movieData.color,
+        movieData.duration,
+      ]
+    );
   });
   it("sould not delete movie", async () => {
     const id = -1;

@@ -87,7 +87,7 @@ describe("POST /api/users", () => {
       .post("/api/users")
       .send(userWithMissingProps);
 
-    expect(response.status).toEqual(400);
+    expect(response.status).toEqual(422);
   });
 });
 
@@ -176,7 +176,7 @@ describe("PUT /api/users/:id", () => {
 
     const response = await request(app).put("/api/users/0").send(newUser);
 
-    expect(response.status).toEqual(404);
+    expect(response.status).toEqual(422);
   });
 });
 describe("DELETE /api/users/:id", () => {
@@ -213,7 +213,7 @@ describe("DELETE /api/users/:id", () => {
       "SELECT * FROM users WHERE id = ?",
       [id]
     );
-    console.log(lastResult);
+
     expect(lastResult.length).toEqual(1);
   });
   it("sould not delete user", async () => {
